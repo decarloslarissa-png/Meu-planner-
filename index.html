@@ -1,0 +1,2169 @@
+```html
+<!DOCTYPE html>```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Planner Digital Premium</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts: Inter & Playfair Display -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            planner: {
+              bg: '#FAF7F2',       /* Creme Suave */
+              card: '#FFFFFF',     /* Branco */
+              accent: '#E8B4B8',   /* Rosa Claro Soft */
+              accentHover: '#DE9FA4',
+              brown: '#6D5959',    /* Marrom Suave */
+              brownDark: '#4A3E3E',
+              roseBg: '#FDF6F6',   /* Fundo levemente rosado */
+              border: '#EFE6DD'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #4A3E3E;
+    }
+    /* Estilização da barra de rolagem */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF7F2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E8B4B8;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased flex flex-col min-h-screen pb-20 md:pb-0 md:flex-row">
+
+  <!-- BARRA DE NAVEGAÇÃO LATERAL (DESKTOP) -->
+  <aside class="hidden md:flex flex-col w-64 bg-white border-r border-planner-border min-h-screen p-6 sticky top-0 h-screen z-20">
+    <div class="mb-8 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-planner-accent/30 flex items-center justify-center text-planner-brown font-serif font-bold text-xl">
+        P
+      </div>
+      <div>
+        <h1 class="font-serif font-semibold text-lg text-planner-brownDark">Meu Planner</h1>
+        <p class="text-xs text-gray-400">Organizador Pessoal</p>
+      </div>
+    </div>
+
+    <!-- Links de Navegação -->
+    <nav class="flex-1 space-y-2">
+      <button onclick="switchTab('meu-dia')" id="nav-meu-dia" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-sun text-planner-accent w-5"></i> Meu Dia
+      </button>
+      <button onclick="switchTab('estudos')" id="nav-estudos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-book-open text-planner-accent w-5"></i> Estudos
+      </button>
+      <button onclick="switchTab('treinos')" id="nav-treinos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-dumbbell text-planner-accent w-5"></i> Treinos
+      </button>
+      <button onclick="switchTab('habitos')" id="nav-habitos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-leaf text-planner-accent w-5"></i> Hábitos
+      </button>
+      <button onclick="switchTab('metas')" id="nav-metas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-bullseye text-planner-accent w-5"></i> Metas
+      </button>
+      <button onclick="switchTab('caderno')" id="nav-caderno" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-pen-nib text-planner-accent w-5"></i> Caderno & Diário
+      </button>
+      <button onclick="switchTab('calendario')" id="nav-calendario" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-regular fa-calendar-days text-planner-accent w-5"></i> Calendário
+      </button>
+    </nav>
+
+    <!-- Backup e Exportação -->
+    <div class="pt-4 border-t border-planner-border space-y-2">
+      <button onclick="exportData()" class="w-full text-left text-xs text-gray-500 hover:text-planner-brown flex items-center gap-2 p-2 rounded-lg">
+        <i class="fa-solid fa-download"></i> Exportar Dados (Backup)
+      </button>
+      <label class="w-full text-left text-xs text-gray-500 hover:text-planner-brown flex items-center gap-2 p-2 rounded-lg cursor-pointer">
+        <i class="fa-solid fa-upload"></i> Importar Backup
+        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)" />
+      </label>
+    </div>
+  </aside>
+
+  <!-- NAVEGAÇÃO INFERIOR (MOBILE) -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-planner-border flex justify-around py-2 px-1 z-30 shadow-lg">
+    <button onclick="switchTab('meu-dia')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-sun text-lg mb-0.5"></i> Dia
+    </button>
+    <button onclick="switchTab('estudos')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-book-open text-lg mb-0.5"></i> Estudos
+    </button>
+    <button onclick="switchTab('treinos')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-dumbbell text-lg mb-0.5"></i> Treino
+    </button>
+    <button onclick="switchTab('habitos')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-leaf text-lg mb-0.5"></i> Hábitos
+    </button>
+    <button onclick="switchTab('metas')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-bullseye text-lg mb-0.5"></i> Metas
+    </button>
+    <button onclick="switchTab('caderno')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-pen-nib text-lg mb-0.5"></i> Diário
+    </button>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full overflow-y-auto">
+
+    <!-- CABEÇALHO MOBILE -->
+    <div class="md:hidden flex items-center justify-between mb-6 pb-4 border-b border-planner-border">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-planner-accent/30 flex items-center justify-center text-planner-brown font-serif font-bold">
+          P
+        </div>
+        <h1 class="font-serif font-bold text-planner-brownDark">Meu Planner</h1>
+      </div>
+      <button onclick="exportData()" class="text-xs bg-planner-roseBg border border-planner-accent/40 text-planner-brown px-3 py-1.5 rounded-full flex items-center gap-1">
+        <i class="fa-solid fa-download"></i> Backup
+      </button>
+    </div>
+
+    <!-- SEÇÃO 1: MEU DIA -->
+    <section id="sec-meu-dia" class="tab-content">
+      <!-- Topo com Saudação e Progresso -->
+      <div class="bg-gradient-to-r from-white to-planner-roseBg p-6 rounded-2xl border border-planner-border shadow-sm mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <p class="text-xs font-semibold tracking-wider text-planner-brown uppercase mb-1" id="current-date-str">Carregando data...</p>
+          <h2 class="font-serif text-2xl md:text-3xl font-semibold text-planner-brownDark">Bem-vinda de volta! ✨</h2>
+          <p class="text-sm text-gray-500 mt-1">Organize seu tempo e cuide de você hoje.</p>
+        </div>
+
+        <div class="w-full md:w-auto flex items-center gap-4 bg-white p-4 rounded-xl border border-planner-border shadow-xs">
+          <div class="relative w-16 h-16 flex items-center justify-center">
+            <svg class="w-16 h-16 transform -rotate-90">
+              <circle cx="32" cy="32" r="26" stroke="#EFE6DD" stroke-width="6" fill="transparent"/>
+              <circle id="progress-circle" cx="32" cy="32" r="26" stroke="#E8B4B8" stroke-width="6" fill="transparent" stroke-dasharray="163" stroke-dashoffset="163" class="transition-all duration-500"/>
+            </svg>
+            <span id="progress-text" class="absolute text-xs font-bold text-planner-brown">0%</span>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 font-medium">Progresso Diário</div>
+            <div class="text-sm font-semibold text-planner-brownDark" id="completed-count">0 de 0 concluídas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registro de Humor -->
+      <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm mb-6 flex items-center justify-between flex-wrap gap-3">
+        <span class="text-sm font-medium text-planner-brown">Como você está se sentindo hoje?</span>
+        <div class="flex gap-3 text-2xl">
+          <button onclick="setMood('Radiante 😊')" class="mood-btn transition-transform hover:scale-125" title="Radiante">😊</button>
+          <button onclick="setMood('Tranquila 😌')" class="mood-btn transition-transform hover:scale-125" title="Tranquila">😌</button>
+          <button onclick="setMood('Cansada 🥱')" class="mood-btn transition-transform hover:scale-125" title="Cansada">🥱</button>
+          <button onclick="setMood('Produtiva 💪')" class="mood-btn transition-transform hover:scale-125" title="Produtiva">💪</button>
+          <button onclick="setMood('Reflexiva 💭')" class="mood-btn transition-transform hover:scale-125" title="Reflexiva">💭</button>
+        </div>
+        <span id="current-mood-display" class="text-xs font-semibold text-planner-accent bg-planner-roseBg px-3 py-1 rounded-full">Tranquila 😌</span>
+      </div>
+
+      <!-- Grid Principal do Dia -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Lista de Tarefas -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-serif text-lg font-semibold text-planner-brownDark flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-planner-accent"></i> Tarefas do Dia
+            </h3>
+            <button onclick="openModal('task-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 shadow-xs">
+              <i class="fa-solid fa-plus"></i> Nova Tarefa
+            </button>
+          </div>
+
+          <div id="tasks-list" class="space-y-2">
+            <!-- Renderizado via JS -->
+          </div>
+        </div>
+
+        <!-- Notas Rápidas e Resumos -->
+        <div class="space-y-6">
+          <!-- Bloco de Notas Rápido -->
+          <div class="bg-white p-5 rounded-2xl border border-planner-border shadow-sm">
+            <h3 class="font-serif text-base font-semibold text-planner-brownDark mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-sticky-note text-planner-accent"></i> Notas Rápidas
+            </h3>
+            <textarea id="quick-notes" oninput="saveQuickNotes()" placeholder="Escreva algo rápido para não esquecer..." class="w-full h-32 p-3 bg-planner-bg rounded-xl border border-planner-border text-sm text-planner-brown focus:outline-none focus:border-planner-accent resize-none"></textarea>
+          </div>
+
+          <!-- Resumo de Hábitos de Hoje -->
+          <div class="bg-white p-5 rounded-2xl border border-planner-border shadow-sm">
+            <h3 class="font-serif text-base font-semibold text-planner-brownDark mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-leaf text-planner-accent"></i> Hábitos de Hoje
+            </h3>
+            <div id="today-habits-summary" class="space-y-2 text-xs">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: ESTUDOS -->
+    <section id="sec-estudos" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Organização de Estudos 📚</h2>
+          <p class="text-sm text-gray-500">Planeje suas disciplinas, revisões e sessões de estudo.</p>
+        </div>
+        <button onclick="openModal('study-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Nova Sessão/Matéria
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm">
+          <span class="text-xs text-gray-400">Total Estudado Hoje</span>
+          <p class="text-xl font-bold text-planner-brownDark mt-1" id="study-time-today">0 hrs</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm">
+          <span class="text-xs text-gray-400">Conteúdos Concluídos</span>
+          <p class="text-xl font-bold text-planner-brownDark mt-1" id="study-completed-count">0 / 0</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm">
+          <span class="text-xs text-gray-400">Progresso Geral</span>
+          <p class="text-xl font-bold text-planner-brownDark mt-1" id="study-progress-percent">0%</p>
+        </div>
+      </div>
+
+      <!-- Lista de Matérias/Sessões -->
+      <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+        <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Cronograma e Conteúdos</h3>
+        <div id="study-list" class="space-y-3">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: TREINOS -->
+    <section id="sec-treinos" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Rotina de Treinos 💪</h2>
+          <p class="text-sm text-gray-500">Acompanhe sua evolução física, séries e cargas.</p>
+        </div>
+        <button onclick="openModal('workout-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Novo Treino/Exercício
+        </button>
+      </div>
+
+      <!-- Registros de Treino -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+          <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Exercícios Cadastrados</h3>
+          <div id="workout-list" class="space-y-3">
+            <!-- Renderizado via JS -->
+          </div>
+        </div>
+
+        <!-- Evolução e Medidas -->
+        <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm space-y-4">
+          <h3 class="font-serif text-lg font-semibold text-planner-brownDark">Medidas Corporais</h3>
+          <div class="space-y-2 text-sm">
+            <div>
+              <label class="text-xs text-gray-500">Peso (kg)</label>
+              <input type="number" id="body-weight" onchange="saveBodyStats()" placeholder="ex: 60.5" class="w-full p-2 bg-planner-bg rounded-lg border border-planner-border text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Cintura (cm)</label>
+              <input type="number" id="body-waist" onchange="saveBodyStats()" placeholder="ex: 70" class="w-full p-2 bg-planner-bg rounded-lg border border-planner-border text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Quadril (cm)</label>
+              <input type="number" id="body-hip" onchange="saveBodyStats()" placeholder="ex: 95" class="w-full p-2 bg-planner-bg rounded-lg border border-planner-border text-sm" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: HÁBITOS -->
+    <section id="sec-habitos" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Rastreador de Hábitos 🌱</h2>
+          <p class="text-sm text-gray-500">Construa hábitos diários saudáveis e acompanhe sua consistência.</p>
+        </div>
+        <button onclick="openModal('habit-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Criar Novo Hábito
+        </button>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+        <div id="habits-list" class="space-y-4">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5: METAS -->
+    <section id="sec-metas" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Metas & Planejamento 🎯</h2>
+          <p class="text-sm text-gray-500">Defina seus objetivos de curto, médio e longo prazo.</p>
+        </div>
+        <button onclick="openModal('goal-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Nova Meta
+        </button>
+      </div>
+
+      <div id="goals-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Renderizado via JS -->
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6: CADERNO & DIÁRIO -->
+    <section id="sec-caderno" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Caderno & Diário 📖</h2>
+          <p class="text-sm text-gray-500">Um espaço para suas anotações, pensamentos e memórias.</p>
+        </div>
+        <button onclick="openModal('note-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Nova Anotação
+        </button>
+      </div>
+
+      <div id="notes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Renderizado via JS -->
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7: CALENDÁRIO -->
+    <section id="sec-calendario" class="tab-content hidden">
+      <div class="mb-6">
+        <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Calendário Integrado 🗓️</h2>
+        <p class="text-sm text-gray-500">Visão geral dos seus compromissos e rotina.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <button onclick="changeMonth(-1)" class="p-2 text-planner-brown hover:bg-planner-roseBg rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
+          <h3 id="calendar-month-year" class="font-serif text-lg font-semibold text-planner-brownDark">Mês Ano</h3>
+          <button onclick="changeMonth(1)" class="p-2 text-planner-brown hover:bg-planner-roseBg rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Dias da semana -->
+        <div class="grid grid-cols-7 text-center font-semibold text-xs text-planner-brown mb-2">
+          <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+        </div>
+
+        <!-- Dias do Mês -->
+        <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center text-sm">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAIS DE CADASTRO -->
+
+  <!-- Modal Tarefa -->
+  <div id="task-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Adicionar Tarefa</h3>
+      <form onsubmit="handleAddTask(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Título</label>
+          <input type="text" id="task-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Estudar matemática" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Prioridade</label>
+          <select id="task-priority" class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent">
+            <option value="Baixa">Baixa</option>
+            <option value="Média" selected>Média</option>
+            <option value="Alta">Alta</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Horário (Opcional)</label>
+          <input type="time" id="task-time" class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('task-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Estudo -->
+  <div id="study-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Nova Matéria / Estudo</h3>
+      <form onsubmit="handleAddStudy(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Matéria / Disciplina</label>
+          <input type="text" id="study-subject" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: História / Concurso" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Conteúdo a Estudar</label>
+          <input type="text" id="study-topic" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Revolução Industrial" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Duração Prevista (horas)</label>
+          <input type="number" step="0.5" id="study-duration" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: 1.5" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('study-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Treino -->
+  <div id="workout-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Adicionar Exercício</h3>
+      <form onsubmit="handleAddWorkout(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Grupo Muscular / Treino</label>
+          <input type="text" id="workout-group" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Treino A - Pernas" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Exercício</label>
+          <input type="text" id="workout-name" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Agachamento Livre" />
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-xs font-medium text-gray-600">Séries</label>
+            <input type="text" id="workout-sets" placeholder="Ex: 4" class="w-full p-2 bg-planner-bg rounded-xl border border-planner-border text-sm" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Reps</label>
+            <input type="text" id="workout-reps" placeholder="Ex: 12" class="w-full p-2 bg-planner-bg rounded-xl border border-planner-border text-sm" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Carga (kg)</label>
+            <input type="text" id="workout-weight" placeholder="Ex: 15kg" class="w-full p-2 bg-planner-bg rounded-xl border border-planner-border text-sm" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('workout-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Hábito -->
+  <div id="habit-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Novo Hábito</h3>
+      <form onsubmit="handleAddHabit(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Nome do Hábito</label>
+          <input type="text" id="habit-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Beber 2L de Água" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('habit-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Meta -->
+  <div id="goal-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Nova Meta</h3>
+      <form onsubmit="handleAddGoal(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Título da Meta</label>
+          <input type="text" id="goal-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Ler 12 Livros no Ano" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Prazo / Categoria</label>
+          <select id="goal-term" class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent">
+            <option value="Curto Prazo">Curto Prazo (este mês)</option>
+            <option value="Médio Prazo">Médio Prazo (até 6 meses)</option>
+            <option value="Longo Prazo">Longo Prazo (1 ano+)</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('goal-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Caderno -->
+  <div id="note-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Nova Anotação / Registro</h3>
+      <form onsubmit="handleAddNote(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Título</label>
+          <input type="text" id="note-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Pensamentos da Semana" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Conteúdo</label>
+          <textarea id="note-content" required class="w-full h-32 p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent resize-none" placeholder="Escreva livremente aqui..."></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('note-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LÓGICA JAVASCRIPT -->
+  <script>
+    // ESTADO DA APLICAÇÃO (localStorage)
+    let appData = {
+      tasks: [],
+      studies: [],
+      workouts: [],
+      habits: [],
+      goals: [],
+      notes: [],
+      mood: 'Tranquila 😌',
+      quickNotes: '',
+      bodyStats: { weight: '', waist: '', hip: '' }
+    };
+
+    let currentDate = new Date();
+
+    // INICIALIZAÇÃO
+    window.onload = function() {
+      loadState();
+      renderDateHeader();
+      renderAll();
+      switchTab('meu-dia');
+    };
+
+    function loadState() {
+      const saved = localStorage.getItem('planner_app_data');
+      if (saved) {
+        try {
+          appData = JSON.parse(saved);
+        } catch (e) {
+          console.error('Erro ao ler do localStorage', e);
+        }
+      } else {
+        // Dados de Exemplo para primeira inicialização
+        appData.tasks = [
+          { id: 1, title: 'Fazer caminhada matinal', priority: 'Baixa', time: '07:00', done: true },
+          { id: 2, title: 'Revisar módulo de estudos', priority: 'Alta', time: '10:00', done: false }
+        ];
+        appData.habits = [
+          { id: 1, title: 'Beber 2L de água', doneToday: true },
+          { id: 2, title: 'Ler 15 min', doneToday: false }
+        ];
+        appData.studies = [
+          { id: 1, subject: 'Inglês', topic: 'Vocabulário de Rotina', duration: 1, done: false }
+        ];
+        appData.workouts = [
+          { id: 1, group: 'Treino A', name: 'Agachamento', sets: '3', reps: '12', weight: '10kg', done: false }
+        ];
+        saveState();
+      }
+
+      document.getElementById('quick-notes').value = appData.quickNotes || '';
+      document.getElementById('current-mood-display').innerText = appData.mood || 'Tranquila 😌';
+      document.getElementById('body-weight').value = appData.bodyStats?.weight || '';
+      document.getElementById('body-waist').value = appData.bodyStats?.waist || '';
+      document.getElementById('body-hip').value = appData.bodyStats?.hip || '';
+    }
+
+    function saveState() {
+      localStorage.setItem('planner_app_data', JSON.stringify(appData));
+    }
+
+    // NAVEGAÇÃO ENTRE ABAS
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+
+      // Atualiza estilo dos botões na sidebar
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-planner-roseBg', 'font-semibold'));
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) activeNav.classList.add('bg-planner-roseBg', 'font-semibold');
+
+      if (tabId === 'calendario') renderCalendar();
+    }
+
+    function renderDateHeader() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const str = currentDate.toLocaleDateString('pt-BR', options);
+      document.getElementById('current-date-str').innerText = str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // RENDERIZADORES
+    function renderAll() {
+      renderTasks();
+      renderHabits();
+      renderStudies();
+      renderWorkouts();
+      renderGoals();
+      renderNotes();
+    }
+
+    /* 1. TAREFAS DO DIA */
+    function renderTasks() {
+      const container = document.getElementById('tasks-list');
+      container.innerHTML = '';
+
+      if (appData.tasks.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic py-4 text-center">Nenhuma tarefa para hoje. Clique em "+ Nova Tarefa" para adicionar.</p>`;
+        updateTaskProgress(0, 0);
+        return;
+      }
+
+      let doneCount = 0;
+      appData.tasks.forEach(task => {
+        if (task.done) doneCount++;
+
+        const pColor = task.priority === 'Alta' ? 'bg-red-100 text-red-600' : task.priority === 'Média' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500';
+
+        const item = document.createElement('div');
+        item.className = `flex items-center justify-between p-3 rounded-xl border transition-all ${task.done ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-white border-planner-border hover:border-planner-accent'}`;
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-4 h-4 accent-planner-accent cursor-pointer" />
+            <div>
+              <p class="text-sm font-medium ${task.done ? 'line-through text-gray-400' : 'text-planner-brownDark'}">${task.title}</p>
+              <div class="flex items-center gap-2 mt-0.5">
+                ${task.time ? `<span class="text-[10px] text-gray-400"><i class="fa-regular fa-clock"></i> ${task.time}</span>` : ''}
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${pColor}">${task.priority}</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="deleteTask(${task.id})" class="text-gray-300 hover:text-red-400 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+        `;
+        container.appendChild(item);
+      });
+
+      updateTaskProgress(doneCount, appData.tasks.length);
+    }
+
+    function toggleTask(id) {
+      const t = appData.tasks.find(x => x.id === id);
+      if (t) {
+        t.done = !t.done;
+        saveState();
+        renderTasks();
+      }
+    }
+
+    function deleteTask(id) {
+      appData.tasks = appData.tasks.filter(x => x.id !== id);
+      saveState();
+      renderTasks();
+    }
+
+    function handleAddTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('task-title').value;
+      const priority = document.getElementById('task-priority').value;
+      const time = document.getElementById('task-time').value;
+
+      appData.tasks.push({
+        id: Date.now(),
+        title,
+        priority,
+        time,
+        done: false
+      });
+
+      saveState();
+      renderTasks();
+      closeModal('task-modal');
+      e.target.reset();
+    }
+
+    function updateTaskProgress(done, total) {
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+      document.getElementById('progress-text').innerText = `${percent}%`;
+      document.getElementById('completed-count').innerText = `${done} de ${total} concluídas`;
+
+      const circle = document.getElementById('progress-circle');
+      const circumference = 163;
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    /* HUMOR & NOTAS */
+    function setMood(mood) {
+      appData.mood = mood;
+      document.getElementById('current-mood-display').innerText = mood;
+      saveState();
+    }
+
+    function saveQuickNotes() {
+      appData.quickNotes = document.getElementById('quick-notes').value;
+      saveState();
+    }
+
+    /* 2. ESTUDOS */
+    function renderStudies() {
+      const container = document.getElementById('study-list');
+      container.innerHTML = '';
+
+      let totalHours = 0;
+      let completed = 0;
+
+      if (appData.studies.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhum estudo cadastrado.</p>`;
+      } else {
+        appData.studies.forEach(s => {
+          totalHours += parseFloat(s.duration || 0);
+          if (s.done) completed++;
+
+          const item = document.createElement('div');
+          item.className = `p-4 rounded-xl border border-planner-border flex items-center justify-between ${s.done ? 'bg-gray-50 opacity-60' : 'bg-white'}`;
+          item.innerHTML = `
+            <div>
+              <span class="text-[10px] font-bold text-planner-accent uppercase tracking-wider">${s.subject}</span>
+              <h4 class="text-sm font-semibold text-planner-brownDark ${s.done ? 'line-through' : ''}">${s.topic}</h4>
+              <p class="text-xs text-gray-400"><i class="fa-regular fa-clock"></i> ${s.duration} hrs planejadas</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="toggleStudy(${s.id})" class="px-3 py-1 rounded-lg text-xs font-medium ${s.done ? 'bg-green-100 text-green-700' : 'bg-planner-roseBg text-planner-brown'}">
+                ${s.done ? 'Concluído' : 'Marcar Concluído'}
+              </button>
+              <button onclick="deleteStudy(${s.id})" class="text-gray-300 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      document.getElementById('study-time-today').innerText = `${totalHours} hrs`;
+      document.getElementById('study-completed-count').innerText = `${completed} / ${appData.studies.length}`;
+      const percent = appData.studies.length > 0 ? Math.round((completed / appData.studies.length) * 100) : 0;
+      document.getElementById('study-progress-percent').innerText = `${percent}%`;
+    }
+
+    function handleAddStudy(e) {
+      e.preventDefault();
+      const subject = document.getElementById('study-subject').value;
+      const topic = document.getElementById('study-topic').value;
+      const duration = document.getElementById('study-duration').value;
+
+      appData.studies.push({ id: Date.now(), subject, topic, duration, done: false });
+      saveState();
+      renderStudies();
+      closeModal('study-modal');
+      e.target.reset();
+    }
+
+    function toggleStudy(id) {
+      const s = appData.studies.find(x => x.id === id);
+      if (s) { s.done = !s.done; saveState(); renderStudies(); }
+    }
+
+    function deleteStudy(id) {
+      appData.studies = appData.studies.filter(x => x.id !== id);
+      saveState();
+      renderStudies();
+    }
+
+    /* 3. TREINOS */
+    function renderWorkouts() {
+      const container = document.getElementById('workout-list');
+      container.innerHTML = '';
+
+      if (appData.workouts.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhum exercício cadastrado.</p>`;
+        return;
+      }
+
+      appData.workouts.forEach(w => {
+        const item = document.createElement('div');
+        item.className = `p-4 rounded-xl border border-planner-border flex items-center justify-between ${w.done ? 'bg-gray-50 opacity-60' : 'bg-white'}`;
+        item.innerHTML = `
+          <div>
+            <span class="text-[10px] font-bold text-planner-accent uppercase tracking-wider">${w.group}</span>
+            <h4 class="text-sm font-semibold text-planner-brownDark ${w.done ? 'line-through' : ''}">${w.name}</h4>
+            <p class="text-xs text-gray-400">${w.sets} séries x ${w.reps} reps • ${w.weight}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleWorkout(${w.id})" class="px-3 py-1 rounded-lg text-xs font-medium ${w.done ? 'bg-green-100 text-green-700' : 'bg-planner-roseBg text-planner-brown'}">
+              ${w.done ? 'Feito 💪' : 'Marcar Feito'}
+            </button>
+            <button onclick="deleteWorkout(${w.id})" class="text-gray-300 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function handleAddWorkout(e) {
+      e.preventDefault();
+      const group = document.getElementById('workout-group').value;
+      const name = document.getElementById('workout-name').value;
+      const sets = document.getElementById('workout-sets').value;
+      const reps = document.getElementById('workout-reps').value;
+      const weight = document.getElementById('workout-weight').value;
+
+      appData.workouts.push({ id: Date.now(), group, name, sets, reps, weight, done: false });
+      saveState();
+      renderWorkouts();
+      closeModal('workout-modal');
+      e.target.reset();
+    }
+
+    function toggleWorkout(id) {
+      const w = appData.workouts.find(x => x.id === id);
+      if (w) { w.done = !w.done; saveState(); renderWorkouts(); }
+    }
+
+    function deleteWorkout(id) {
+      appData.workouts = appData.workouts.filter(x => x.id !== id);
+      saveState();
+      renderWorkouts();
+    }
+
+    function saveBodyStats() {
+      appData.bodyStats = {
+        weight: document.getElementById('body-weight').value,
+        waist: document.getElementById('body-waist').value,
+        hip: document.getElementById('body-hip').value
+      };
+      saveState();
+    }
+
+    /* 4. HÁBITOS */
+    function renderHabits() {
+      const container = document.getElementById('habits-list');
+      const summaryContainer = document.getElementById('today-habits-summary');
+
+      container.innerHTML = '';
+      summaryContainer.innerHTML = '';
+
+      if (appData.habits.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhum hábito cadastrado.</p>`;
+        summaryContainer.innerHTML = `<p class="text-xs text-gray-400 italic">Sem hábitos hoje.</p>`;
+        return;
+      }
+
+      appData.habits.forEach(h => {
+        // Render na aba de hábitos
+        const item = document.createElement('div');
+        item.className = `flex items-center justify-between p-4 rounded-xl border border-planner-border bg-white`;
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <button onclick="toggleHabit(${h.id})" class="w-8 h-8 rounded-full flex items-center justify-center border transition-all ${h.doneToday ? 'bg-planner-accent border-planner-accent text-white' : 'border-gray-300 text-transparent hover:border-planner-accent'}">
+              <i class="fa-solid fa-check text-xs"></i>
+            </button>
+            <span class="text-sm font-medium text-planner-brownDark ${h.doneToday ? 'line-through text-gray-400' : ''}">${h.title}</span>
+          </div>
+          <button onclick="deleteHabit(${h.id})" class="text-gray-300 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+        `;
+        container.appendChild(item);
+
+        // Render no resumo do Meu Dia
+        const sumItem = document.createElement('div');
+        sumItem.className = `flex items-center justify-between p-2 rounded-lg bg-planner-bg`;
+        sumItem.innerHTML = `
+          <span class="text-xs font-medium text-planner-brown ${h.doneToday ? 'line-through opacity-50' : ''}">${h.title}</span>
+          <button onclick="toggleHabit(${h.id})" class="text-xs font-bold ${h.doneToday ? 'text-green-600' : 'text-gray-400'}">
+            ${h.doneToday ? '✓' : '○'}
+          </button>
+        `;
+        summaryContainer.appendChild(sumItem);
+      });
+    }
+
+    function handleAddHabit(e) {
+      e.preventDefault();
+      const title = document.getElementById('habit-title').value;
+      appData.habits.push({ id: Date.now(), title, doneToday: false });
+      saveState();
+      renderHabits();
+      closeModal('habit-modal');
+      e.target.reset();
+    }
+
+    function toggleHabit(id) {
+      const h = appData.habits.find(x => x.id === id);
+      if (h) { h.doneToday = !h.doneToday; saveState(); renderHabits(); }
+    }
+
+    function deleteHabit(id) {
+      appData.habits = appData.habits.filter(x => x.id !== id);
+      saveState();
+      renderHabits();
+    }
+
+    /* 5. METAS */
+    function renderGoals() {
+      const container = document.getElementById('goals-list');
+      container.innerHTML = '';
+
+      if (appData.goals.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic col-span-2 text-center py-4">Nenhuma meta cadastrada.</p>`;
+        return;
+      }
+
+      appData.goals.forEach(g => {
+        const item = document.createElement('div');
+        item.className = `bg-white p-5 rounded-2xl border border-planner-border shadow-sm flex flex-col justify-between`;
+        item.innerHTML = `
+          <div>
+            <span class="text-[10px] font-bold text-planner-accent uppercase tracking-wider">${g.term}</span>
+            <h4 class="text-base font-serif font-semibold text-planner-brownDark mt-1 mb-3">${g.title}</h4>
+          </div>
+          <div class="flex items-center justify-between border-t border-planner-border pt-3 mt-4">
+            <button onclick="deleteGoal(${g.id})" class="text-xs text-gray-400 hover:text-red-400"><i class="fa-solid fa-trash"></i> Excluir</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function handleAddGoal(e) {
+      e.preventDefault();
+      const title = document.getElementById('goal-title').value;
+      const term = document.getElementById('goal-term').value;
+      appData.goals.push({ id: Date.now(), title, term });
+      saveState();
+      renderGoals();
+      closeModal('goal-modal');
+      e.target.reset();
+    }
+
+    function deleteGoal(id) {
+      appData.goals = appData.goals.filter(x => x.id !== id);
+      saveState();
+      renderGoals();
+    }
+
+    /* 6. CADERNO & DIÁRIO */
+    function renderNotes() {
+      const container = document.getElementById('notes-list');
+      container.innerHTML = '';
+
+      if (appData.notes.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic col-span-3 text-center py-4">Nenhuma anotação criada.</p>`;
+        return;
+      }
+
+      appData.notes.forEach(n => {
+        const item = document.createElement('div');
+        item.className = `bg-white p-5 rounded-2xl border border-planner-border shadow-sm flex flex-col justify-between h-48`;
+        item.innerHTML = `
+          <div>
+            <h4 class="font-serif font-semibold text-planner-brownDark text-base mb-2 line-clamp-1">${n.title}</h4>
+            <p class="text-xs text-gray-500 whitespace-pre-line line-clamp-4">${n.content}</p>
+          </div>
+          <div class="flex items-center justify-between border-t border-planner-border pt-2 text-[10px] text-gray-400">
+            <span>${n.date}</span>
+            <button onclick="deleteNote(${n.id})" class="text-gray-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function handleAddNote(e) {
+      e.preventDefault();
+      const title = document.getElementById('note-title').value;
+      const content = document.getElementById('note-content').value;
+      const date = new Date().toLocaleDateString('pt-BR');
+
+      appData.notes.push({ id: Date.now(), title, content, date });
+      saveState();
+      renderNotes();
+      closeModal('note-modal');
+      e.target.reset();
+    }
+
+    function deleteNote(id) {
+      appData.notes = appData.notes.filter(x => x.id !== id);
+      saveState();
+      renderNotes();
+    }
+
+    /* 7. CALENDÁRIO */
+    let calDate = new Date();
+
+    function renderCalendar() {
+      const monthYearStr = calDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      document.getElementById('calendar-month-year').innerText = monthYearStr.charAt(0).toUpperCase() + monthYearStr.slice(1);
+
+      const daysContainer = document.getElementById('calendar-days');
+      daysContainer.innerHTML = '';
+
+      const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1).getDay();
+      const totalDays = new Date(calDate.getFullYear(), calDate.getMonth() + 1, 0).getDate();
+
+      // Espaços vazios do início do mês
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'p-3 text-gray-200';
+        daysContainer.appendChild(empty);
+      }
+
+      // Dias reais
+      const today = new Date();
+      for (let d = 1; d <= totalDays; d++) {
+        const isToday = today.getDate() === d && today.getMonth() === calDate.getMonth() && today.getFullYear() === calDate.getFullYear();
+        const cell = document.createElement('div');
+        cell.className = `p-3 rounded-xl border border-planner-border flex flex-col items-center justify-center min-h-[50px] ${isToday ? 'bg-planner-accent text-white font-bold' : 'bg-white text-planner-brown hover:bg-planner-roseBg'}`;
+        cell.innerText = d;
+        daysContainer.appendChild(cell);
+      }
+    }
+
+    function changeMonth(delta) {
+      calDate.setMonth(calDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    /* MODAIS */
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.getElementById(id).classList.remove('flex');
+    }
+
+    /* BACKUP / EXPORTAÇÃO */
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `meu_planner_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          appData = imported;
+          saveState();
+          location.reload();
+        } catch (err) {
+          alert('Arquivo de backup inválido.');
+        }
+      };
+      reader.readAsText(event.target.files[0]);
+    }
+  </script>
+</body>
+</html>
+```
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meu Planner Digital Premium</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <!-- Google Fonts: Inter & Playfair Display -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            planner: {
+              bg: '#FAF7F2',       /* Creme Suave */
+              card: '#FFFFFF',     /* Branco */
+              accent: '#E8B4B8',   /* Rosa Claro Soft */
+              accentHover: '#DE9FA4',
+              brown: '#6D5959',    /* Marrom Suave */
+              brownDark: '#4A3E3E',
+              roseBg: '#FDF6F6',   /* Fundo levemente rosado */
+              border: '#EFE6DD'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Playfair Display', 'serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    body {
+      background-color: #FAF7F2;
+      color: #4A3E3E;
+    }
+    /* Estilização da barra de rolagem */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #FAF7F2;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E8B4B8;
+      border-radius: 9999px;
+    }
+  </style>
+</head>
+<body class="font-sans antialiased flex flex-col min-h-screen pb-20 md:pb-0 md:flex-row">
+
+  <!-- BARRA DE NAVEGAÇÃO LATERAL (DESKTOP) -->
+  <aside class="hidden md:flex flex-col w-64 bg-white border-r border-planner-border min-h-screen p-6 sticky top-0 h-screen z-20">
+    <div class="mb-8 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-planner-accent/30 flex items-center justify-center text-planner-brown font-serif font-bold text-xl">
+        P
+      </div>
+      <div>
+        <h1 class="font-serif font-semibold text-lg text-planner-brownDark">Meu Planner</h1>
+        <p class="text-xs text-gray-400">Organizador Pessoal</p>
+      </div>
+    </div>
+
+    <!-- Links de Navegação -->
+    <nav class="flex-1 space-y-2">
+      <button onclick="switchTab('meu-dia')" id="nav-meu-dia" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-sun text-planner-accent w-5"></i> Meu Dia
+      </button>
+      <button onclick="switchTab('estudos')" id="nav-estudos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-book-open text-planner-accent w-5"></i> Estudos
+      </button>
+      <button onclick="switchTab('treinos')" id="nav-treinos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-dumbbell text-planner-accent w-5"></i> Treinos
+      </button>
+      <button onclick="switchTab('habitos')" id="nav-habitos" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-leaf text-planner-accent w-5"></i> Hábitos
+      </button>
+      <button onclick="switchTab('metas')" id="nav-metas" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-bullseye text-planner-accent w-5"></i> Metas
+      </button>
+      <button onclick="switchTab('caderno')" id="nav-caderno" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-solid fa-pen-nib text-planner-accent w-5"></i> Caderno & Diário
+      </button>
+      <button onclick="switchTab('calendario')" id="nav-calendario" class="nav-btn w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-colors hover:bg-planner-roseBg text-planner-brown">
+        <i class="fa-regular fa-calendar-days text-planner-accent w-5"></i> Calendário
+      </button>
+    </nav>
+
+    <!-- Backup e Exportação -->
+    <div class="pt-4 border-t border-planner-border space-y-2">
+      <button onclick="exportData()" class="w-full text-left text-xs text-gray-500 hover:text-planner-brown flex items-center gap-2 p-2 rounded-lg">
+        <i class="fa-solid fa-download"></i> Exportar Dados (Backup)
+      </button>
+      <label class="w-full text-left text-xs text-gray-500 hover:text-planner-brown flex items-center gap-2 p-2 rounded-lg cursor-pointer">
+        <i class="fa-solid fa-upload"></i> Importar Backup
+        <input type="file" id="importFile" class="hidden" accept=".json" onchange="importData(event)" />
+      </label>
+    </div>
+  </aside>
+
+  <!-- NAVEGAÇÃO INFERIOR (MOBILE) -->
+  <div class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-planner-border flex justify-around py-2 px-1 z-30 shadow-lg">
+    <button onclick="switchTab('meu-dia')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-sun text-lg mb-0.5"></i> Dia
+    </button>
+    <button onclick="switchTab('estudos')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-book-open text-lg mb-0.5"></i> Estudos
+    </button>
+    <button onclick="switchTab('treinos')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-dumbbell text-lg mb-0.5"></i> Treino
+    </button>
+    <button onclick="switchTab('habitos')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-leaf text-lg mb-0.5"></i> Hábitos
+    </button>
+    <button onclick="switchTab('metas')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-bullseye text-lg mb-0.5"></i> Metas
+    </button>
+    <button onclick="switchTab('caderno')" class="mobile-nav-btn flex flex-col items-center p-1 text-planner-brown text-xs">
+      <i class="fa-solid fa-pen-nib text-lg mb-0.5"></i> Diário
+    </button>
+  </div>
+
+  <!-- CONTEÚDO PRINCIPAL -->
+  <main class="flex-1 p-4 md:p-8 max-w-6xl mx-auto w-full overflow-y-auto">
+
+    <!-- CABEÇALHO MOBILE -->
+    <div class="md:hidden flex items-center justify-between mb-6 pb-4 border-b border-planner-border">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 rounded-full bg-planner-accent/30 flex items-center justify-center text-planner-brown font-serif font-bold">
+          P
+        </div>
+        <h1 class="font-serif font-bold text-planner-brownDark">Meu Planner</h1>
+      </div>
+      <button onclick="exportData()" class="text-xs bg-planner-roseBg border border-planner-accent/40 text-planner-brown px-3 py-1.5 rounded-full flex items-center gap-1">
+        <i class="fa-solid fa-download"></i> Backup
+      </button>
+    </div>
+
+    <!-- SEÇÃO 1: MEU DIA -->
+    <section id="sec-meu-dia" class="tab-content">
+      <!-- Topo com Saudação e Progresso -->
+      <div class="bg-gradient-to-r from-white to-planner-roseBg p-6 rounded-2xl border border-planner-border shadow-sm mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <p class="text-xs font-semibold tracking-wider text-planner-brown uppercase mb-1" id="current-date-str">Carregando data...</p>
+          <h2 class="font-serif text-2xl md:text-3xl font-semibold text-planner-brownDark">Bem-vinda de volta! ✨</h2>
+          <p class="text-sm text-gray-500 mt-1">Organize seu tempo e cuide de você hoje.</p>
+        </div>
+
+        <div class="w-full md:w-auto flex items-center gap-4 bg-white p-4 rounded-xl border border-planner-border shadow-xs">
+          <div class="relative w-16 h-16 flex items-center justify-center">
+            <svg class="w-16 h-16 transform -rotate-90">
+              <circle cx="32" cy="32" r="26" stroke="#EFE6DD" stroke-width="6" fill="transparent"/>
+              <circle id="progress-circle" cx="32" cy="32" r="26" stroke="#E8B4B8" stroke-width="6" fill="transparent" stroke-dasharray="163" stroke-dashoffset="163" class="transition-all duration-500"/>
+            </svg>
+            <span id="progress-text" class="absolute text-xs font-bold text-planner-brown">0%</span>
+          </div>
+          <div>
+            <div class="text-xs text-gray-400 font-medium">Progresso Diário</div>
+            <div class="text-sm font-semibold text-planner-brownDark" id="completed-count">0 de 0 concluídas</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Registro de Humor -->
+      <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm mb-6 flex items-center justify-between flex-wrap gap-3">
+        <span class="text-sm font-medium text-planner-brown">Como você está se sentindo hoje?</span>
+        <div class="flex gap-3 text-2xl">
+          <button onclick="setMood('Radiante 😊')" class="mood-btn transition-transform hover:scale-125" title="Radiante">😊</button>
+          <button onclick="setMood('Tranquila 😌')" class="mood-btn transition-transform hover:scale-125" title="Tranquila">😌</button>
+          <button onclick="setMood('Cansada 🥱')" class="mood-btn transition-transform hover:scale-125" title="Cansada">🥱</button>
+          <button onclick="setMood('Produtiva 💪')" class="mood-btn transition-transform hover:scale-125" title="Produtiva">💪</button>
+          <button onclick="setMood('Reflexiva 💭')" class="mood-btn transition-transform hover:scale-125" title="Reflexiva">💭</button>
+        </div>
+        <span id="current-mood-display" class="text-xs font-semibold text-planner-accent bg-planner-roseBg px-3 py-1 rounded-full">Tranquila 😌</span>
+      </div>
+
+      <!-- Grid Principal do Dia -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- Lista de Tarefas -->
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="font-serif text-lg font-semibold text-planner-brownDark flex items-center gap-2">
+              <i class="fa-solid fa-list-check text-planner-accent"></i> Tarefas do Dia
+            </h3>
+            <button onclick="openModal('task-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1 shadow-xs">
+              <i class="fa-solid fa-plus"></i> Nova Tarefa
+            </button>
+          </div>
+
+          <div id="tasks-list" class="space-y-2">
+            <!-- Renderizado via JS -->
+          </div>
+        </div>
+
+        <!-- Notas Rápidas e Resumos -->
+        <div class="space-y-6">
+          <!-- Bloco de Notas Rápido -->
+          <div class="bg-white p-5 rounded-2xl border border-planner-border shadow-sm">
+            <h3 class="font-serif text-base font-semibold text-planner-brownDark mb-2 flex items-center gap-2">
+              <i class="fa-solid fa-sticky-note text-planner-accent"></i> Notas Rápidas
+            </h3>
+            <textarea id="quick-notes" oninput="saveQuickNotes()" placeholder="Escreva algo rápido para não esquecer..." class="w-full h-32 p-3 bg-planner-bg rounded-xl border border-planner-border text-sm text-planner-brown focus:outline-none focus:border-planner-accent resize-none"></textarea>
+          </div>
+
+          <!-- Resumo de Hábitos de Hoje -->
+          <div class="bg-white p-5 rounded-2xl border border-planner-border shadow-sm">
+            <h3 class="font-serif text-base font-semibold text-planner-brownDark mb-3 flex items-center gap-2">
+              <i class="fa-solid fa-leaf text-planner-accent"></i> Hábitos de Hoje
+            </h3>
+            <div id="today-habits-summary" class="space-y-2 text-xs">
+              <!-- Renderizado via JS -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SEÇÃO 2: ESTUDOS -->
+    <section id="sec-estudos" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Organização de Estudos 📚</h2>
+          <p class="text-sm text-gray-500">Planeje suas disciplinas, revisões e sessões de estudo.</p>
+        </div>
+        <button onclick="openModal('study-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Nova Sessão/Matéria
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm">
+          <span class="text-xs text-gray-400">Total Estudado Hoje</span>
+          <p class="text-xl font-bold text-planner-brownDark mt-1" id="study-time-today">0 hrs</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm">
+          <span class="text-xs text-gray-400">Conteúdos Concluídos</span>
+          <p class="text-xl font-bold text-planner-brownDark mt-1" id="study-completed-count">0 / 0</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-planner-border shadow-sm">
+          <span class="text-xs text-gray-400">Progresso Geral</span>
+          <p class="text-xl font-bold text-planner-brownDark mt-1" id="study-progress-percent">0%</p>
+        </div>
+      </div>
+
+      <!-- Lista de Matérias/Sessões -->
+      <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+        <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Cronograma e Conteúdos</h3>
+        <div id="study-list" class="space-y-3">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 3: TREINOS -->
+    <section id="sec-treinos" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Rotina de Treinos 💪</h2>
+          <p class="text-sm text-gray-500">Acompanhe sua evolução física, séries e cargas.</p>
+        </div>
+        <button onclick="openModal('workout-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Novo Treino/Exercício
+        </button>
+      </div>
+
+      <!-- Registros de Treino -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+          <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Exercícios Cadastrados</h3>
+          <div id="workout-list" class="space-y-3">
+            <!-- Renderizado via JS -->
+          </div>
+        </div>
+
+        <!-- Evolução e Medidas -->
+        <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm space-y-4">
+          <h3 class="font-serif text-lg font-semibold text-planner-brownDark">Medidas Corporais</h3>
+          <div class="space-y-2 text-sm">
+            <div>
+              <label class="text-xs text-gray-500">Peso (kg)</label>
+              <input type="number" id="body-weight" onchange="saveBodyStats()" placeholder="ex: 60.5" class="w-full p-2 bg-planner-bg rounded-lg border border-planner-border text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Cintura (cm)</label>
+              <input type="number" id="body-waist" onchange="saveBodyStats()" placeholder="ex: 70" class="w-full p-2 bg-planner-bg rounded-lg border border-planner-border text-sm" />
+            </div>
+            <div>
+              <label class="text-xs text-gray-500">Quadril (cm)</label>
+              <input type="number" id="body-hip" onchange="saveBodyStats()" placeholder="ex: 95" class="w-full p-2 bg-planner-bg rounded-lg border border-planner-border text-sm" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 4: HÁBITOS -->
+    <section id="sec-habitos" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Rastreador de Hábitos 🌱</h2>
+          <p class="text-sm text-gray-500">Construa hábitos diários saudáveis e acompanhe sua consistência.</p>
+        </div>
+        <button onclick="openModal('habit-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Criar Novo Hábito
+        </button>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+        <div id="habits-list" class="space-y-4">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO 5: METAS -->
+    <section id="sec-metas" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Metas & Planejamento 🎯</h2>
+          <p class="text-sm text-gray-500">Defina seus objetivos de curto, médio e longo prazo.</p>
+        </div>
+        <button onclick="openModal('goal-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Nova Meta
+        </button>
+      </div>
+
+      <div id="goals-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Renderizado via JS -->
+      </div>
+    </section>
+
+    <!-- SEÇÃO 6: CADERNO & DIÁRIO -->
+    <section id="sec-caderno" class="tab-content hidden">
+      <div class="flex justify-between items-center mb-6">
+        <div>
+          <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Caderno & Diário 📖</h2>
+          <p class="text-sm text-gray-500">Um espaço para suas anotações, pensamentos e memórias.</p>
+        </div>
+        <button onclick="openModal('note-modal')" class="bg-planner-accent hover:bg-planner-accentHover text-white px-4 py-2 rounded-xl text-xs font-medium transition-colors shadow-xs">
+          + Nova Anotação
+        </button>
+      </div>
+
+      <div id="notes-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Renderizado via JS -->
+      </div>
+    </section>
+
+    <!-- SEÇÃO 7: CALENDÁRIO -->
+    <section id="sec-calendario" class="tab-content hidden">
+      <div class="mb-6">
+        <h2 class="font-serif text-2xl font-semibold text-planner-brownDark">Calendário Integrado 🗓️</h2>
+        <p class="text-sm text-gray-500">Visão geral dos seus compromissos e rotina.</p>
+      </div>
+
+      <div class="bg-white p-6 rounded-2xl border border-planner-border shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <button onclick="changeMonth(-1)" class="p-2 text-planner-brown hover:bg-planner-roseBg rounded-lg"><i class="fa-solid fa-chevron-left"></i></button>
+          <h3 id="calendar-month-year" class="font-serif text-lg font-semibold text-planner-brownDark">Mês Ano</h3>
+          <button onclick="changeMonth(1)" class="p-2 text-planner-brown hover:bg-planner-roseBg rounded-lg"><i class="fa-solid fa-chevron-right"></i></button>
+        </div>
+
+        <!-- Dias da semana -->
+        <div class="grid grid-cols-7 text-center font-semibold text-xs text-planner-brown mb-2">
+          <div>Dom</div><div>Seg</div><div>Ter</div><div>Qua</div><div>Qui</div><div>Sex</div><div>Sáb</div>
+        </div>
+
+        <!-- Dias do Mês -->
+        <div id="calendar-days" class="grid grid-cols-7 gap-1 text-center text-sm">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAIS DE CADASTRO -->
+
+  <!-- Modal Tarefa -->
+  <div id="task-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Adicionar Tarefa</h3>
+      <form onsubmit="handleAddTask(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Título</label>
+          <input type="text" id="task-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Estudar matemática" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Prioridade</label>
+          <select id="task-priority" class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent">
+            <option value="Baixa">Baixa</option>
+            <option value="Média" selected>Média</option>
+            <option value="Alta">Alta</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Horário (Opcional)</label>
+          <input type="time" id="task-time" class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('task-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Estudo -->
+  <div id="study-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Nova Matéria / Estudo</h3>
+      <form onsubmit="handleAddStudy(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Matéria / Disciplina</label>
+          <input type="text" id="study-subject" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: História / Concurso" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Conteúdo a Estudar</label>
+          <input type="text" id="study-topic" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Revolução Industrial" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Duração Prevista (horas)</label>
+          <input type="number" step="0.5" id="study-duration" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: 1.5" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('study-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Treino -->
+  <div id="workout-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Adicionar Exercício</h3>
+      <form onsubmit="handleAddWorkout(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Grupo Muscular / Treino</label>
+          <input type="text" id="workout-group" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Treino A - Pernas" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Exercício</label>
+          <input type="text" id="workout-name" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Agachamento Livre" />
+        </div>
+        <div class="grid grid-cols-3 gap-2">
+          <div>
+            <label class="text-xs font-medium text-gray-600">Séries</label>
+            <input type="text" id="workout-sets" placeholder="Ex: 4" class="w-full p-2 bg-planner-bg rounded-xl border border-planner-border text-sm" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Reps</label>
+            <input type="text" id="workout-reps" placeholder="Ex: 12" class="w-full p-2 bg-planner-bg rounded-xl border border-planner-border text-sm" />
+          </div>
+          <div>
+            <label class="text-xs font-medium text-gray-600">Carga (kg)</label>
+            <input type="text" id="workout-weight" placeholder="Ex: 15kg" class="w-full p-2 bg-planner-bg rounded-xl border border-planner-border text-sm" />
+          </div>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('workout-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Hábito -->
+  <div id="habit-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Novo Hábito</h3>
+      <form onsubmit="handleAddHabit(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Nome do Hábito</label>
+          <input type="text" id="habit-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Beber 2L de Água" />
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('habit-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Meta -->
+  <div id="goal-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Nova Meta</h3>
+      <form onsubmit="handleAddGoal(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Título da Meta</label>
+          <input type="text" id="goal-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Ler 12 Livros no Ano" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Prazo / Categoria</label>
+          <select id="goal-term" class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent">
+            <option value="Curto Prazo">Curto Prazo (este mês)</option>
+            <option value="Médio Prazo">Médio Prazo (até 6 meses)</option>
+            <option value="Longo Prazo">Longo Prazo (1 ano+)</option>
+          </select>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('goal-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal Caderno -->
+  <div id="note-modal" class="fixed inset-0 bg-black/40 hidden items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-planner-border">
+      <h3 class="font-serif text-lg font-semibold text-planner-brownDark mb-4">Nova Anotação / Registro</h3>
+      <form onsubmit="handleAddNote(event)" class="space-y-4">
+        <div>
+          <label class="text-xs font-medium text-gray-600">Título</label>
+          <input type="text" id="note-title" required class="w-full p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent" placeholder="Ex: Pensamentos da Semana" />
+        </div>
+        <div>
+          <label class="text-xs font-medium text-gray-600">Conteúdo</label>
+          <textarea id="note-content" required class="w-full h-32 p-2.5 bg-planner-bg rounded-xl border border-planner-border text-sm focus:outline-none focus:border-planner-accent resize-none" placeholder="Escreva livremente aqui..."></textarea>
+        </div>
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('note-modal')" class="px-4 py-2 text-xs rounded-xl bg-gray-100 text-gray-600">Cancelar</button>
+          <button type="submit" class="px-4 py-2 text-xs rounded-xl bg-planner-accent text-white font-medium">Salvar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- LÓGICA JAVASCRIPT -->
+  <script>
+    // ESTADO DA APLICAÇÃO (localStorage)
+    let appData = {
+      tasks: [],
+      studies: [],
+      workouts: [],
+      habits: [],
+      goals: [],
+      notes: [],
+      mood: 'Tranquila 😌',
+      quickNotes: '',
+      bodyStats: { weight: '', waist: '', hip: '' }
+    };
+
+    let currentDate = new Date();
+
+    // INICIALIZAÇÃO
+    window.onload = function() {
+      loadState();
+      renderDateHeader();
+      renderAll();
+      switchTab('meu-dia');
+    };
+
+    function loadState() {
+      const saved = localStorage.getItem('planner_app_data');
+      if (saved) {
+        try {
+          appData = JSON.parse(saved);
+        } catch (e) {
+          console.error('Erro ao ler do localStorage', e);
+        }
+      } else {
+        // Dados de Exemplo para primeira inicialização
+        appData.tasks = [
+          { id: 1, title: 'Fazer caminhada matinal', priority: 'Baixa', time: '07:00', done: true },
+          { id: 2, title: 'Revisar módulo de estudos', priority: 'Alta', time: '10:00', done: false }
+        ];
+        appData.habits = [
+          { id: 1, title: 'Beber 2L de água', doneToday: true },
+          { id: 2, title: 'Ler 15 min', doneToday: false }
+        ];
+        appData.studies = [
+          { id: 1, subject: 'Inglês', topic: 'Vocabulário de Rotina', duration: 1, done: false }
+        ];
+        appData.workouts = [
+          { id: 1, group: 'Treino A', name: 'Agachamento', sets: '3', reps: '12', weight: '10kg', done: false }
+        ];
+        saveState();
+      }
+
+      document.getElementById('quick-notes').value = appData.quickNotes || '';
+      document.getElementById('current-mood-display').innerText = appData.mood || 'Tranquila 😌';
+      document.getElementById('body-weight').value = appData.bodyStats?.weight || '';
+      document.getElementById('body-waist').value = appData.bodyStats?.waist || '';
+      document.getElementById('body-hip').value = appData.bodyStats?.hip || '';
+    }
+
+    function saveState() {
+      localStorage.setItem('planner_app_data', JSON.stringify(appData));
+    }
+
+    // NAVEGAÇÃO ENTRE ABAS
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.getElementById(`sec-${tabId}`).classList.remove('hidden');
+
+      // Atualiza estilo dos botões na sidebar
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('bg-planner-roseBg', 'font-semibold'));
+      const activeNav = document.getElementById(`nav-${tabId}`);
+      if (activeNav) activeNav.classList.add('bg-planner-roseBg', 'font-semibold');
+
+      if (tabId === 'calendario') renderCalendar();
+    }
+
+    function renderDateHeader() {
+      const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+      const str = currentDate.toLocaleDateString('pt-BR', options);
+      document.getElementById('current-date-str').innerText = str.charAt(0).toUpperCase() + str.slice(1);
+    }
+
+    // RENDERIZADORES
+    function renderAll() {
+      renderTasks();
+      renderHabits();
+      renderStudies();
+      renderWorkouts();
+      renderGoals();
+      renderNotes();
+    }
+
+    /* 1. TAREFAS DO DIA */
+    function renderTasks() {
+      const container = document.getElementById('tasks-list');
+      container.innerHTML = '';
+
+      if (appData.tasks.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic py-4 text-center">Nenhuma tarefa para hoje. Clique em "+ Nova Tarefa" para adicionar.</p>`;
+        updateTaskProgress(0, 0);
+        return;
+      }
+
+      let doneCount = 0;
+      appData.tasks.forEach(task => {
+        if (task.done) doneCount++;
+
+        const pColor = task.priority === 'Alta' ? 'bg-red-100 text-red-600' : task.priority === 'Média' ? 'bg-amber-100 text-amber-600' : 'bg-gray-100 text-gray-500';
+
+        const item = document.createElement('div');
+        item.className = `flex items-center justify-between p-3 rounded-xl border transition-all ${task.done ? 'bg-gray-50 border-gray-200 opacity-60' : 'bg-white border-planner-border hover:border-planner-accent'}`;
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <input type="checkbox" ${task.done ? 'checked' : ''} onchange="toggleTask(${task.id})" class="w-4 h-4 accent-planner-accent cursor-pointer" />
+            <div>
+              <p class="text-sm font-medium ${task.done ? 'line-through text-gray-400' : 'text-planner-brownDark'}">${task.title}</p>
+              <div class="flex items-center gap-2 mt-0.5">
+                ${task.time ? `<span class="text-[10px] text-gray-400"><i class="fa-regular fa-clock"></i> ${task.time}</span>` : ''}
+                <span class="text-[10px] font-semibold px-2 py-0.5 rounded-full ${pColor}">${task.priority}</span>
+              </div>
+            </div>
+          </div>
+          <button onclick="deleteTask(${task.id})" class="text-gray-300 hover:text-red-400 text-xs px-2 py-1"><i class="fa-solid fa-trash"></i></button>
+        `;
+        container.appendChild(item);
+      });
+
+      updateTaskProgress(doneCount, appData.tasks.length);
+    }
+
+    function toggleTask(id) {
+      const t = appData.tasks.find(x => x.id === id);
+      if (t) {
+        t.done = !t.done;
+        saveState();
+        renderTasks();
+      }
+    }
+
+    function deleteTask(id) {
+      appData.tasks = appData.tasks.filter(x => x.id !== id);
+      saveState();
+      renderTasks();
+    }
+
+    function handleAddTask(e) {
+      e.preventDefault();
+      const title = document.getElementById('task-title').value;
+      const priority = document.getElementById('task-priority').value;
+      const time = document.getElementById('task-time').value;
+
+      appData.tasks.push({
+        id: Date.now(),
+        title,
+        priority,
+        time,
+        done: false
+      });
+
+      saveState();
+      renderTasks();
+      closeModal('task-modal');
+      e.target.reset();
+    }
+
+    function updateTaskProgress(done, total) {
+      const percent = total > 0 ? Math.round((done / total) * 100) : 0;
+      document.getElementById('progress-text').innerText = `${percent}%`;
+      document.getElementById('completed-count').innerText = `${done} de ${total} concluídas`;
+
+      const circle = document.getElementById('progress-circle');
+      const circumference = 163;
+      const offset = circumference - (percent / 100) * circumference;
+      circle.style.strokeDashoffset = offset;
+    }
+
+    /* HUMOR & NOTAS */
+    function setMood(mood) {
+      appData.mood = mood;
+      document.getElementById('current-mood-display').innerText = mood;
+      saveState();
+    }
+
+    function saveQuickNotes() {
+      appData.quickNotes = document.getElementById('quick-notes').value;
+      saveState();
+    }
+
+    /* 2. ESTUDOS */
+    function renderStudies() {
+      const container = document.getElementById('study-list');
+      container.innerHTML = '';
+
+      let totalHours = 0;
+      let completed = 0;
+
+      if (appData.studies.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhum estudo cadastrado.</p>`;
+      } else {
+        appData.studies.forEach(s => {
+          totalHours += parseFloat(s.duration || 0);
+          if (s.done) completed++;
+
+          const item = document.createElement('div');
+          item.className = `p-4 rounded-xl border border-planner-border flex items-center justify-between ${s.done ? 'bg-gray-50 opacity-60' : 'bg-white'}`;
+          item.innerHTML = `
+            <div>
+              <span class="text-[10px] font-bold text-planner-accent uppercase tracking-wider">${s.subject}</span>
+              <h4 class="text-sm font-semibold text-planner-brownDark ${s.done ? 'line-through' : ''}">${s.topic}</h4>
+              <p class="text-xs text-gray-400"><i class="fa-regular fa-clock"></i> ${s.duration} hrs planejadas</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="toggleStudy(${s.id})" class="px-3 py-1 rounded-lg text-xs font-medium ${s.done ? 'bg-green-100 text-green-700' : 'bg-planner-roseBg text-planner-brown'}">
+                ${s.done ? 'Concluído' : 'Marcar Concluído'}
+              </button>
+              <button onclick="deleteStudy(${s.id})" class="text-gray-300 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          `;
+          container.appendChild(item);
+        });
+      }
+
+      document.getElementById('study-time-today').innerText = `${totalHours} hrs`;
+      document.getElementById('study-completed-count').innerText = `${completed} / ${appData.studies.length}`;
+      const percent = appData.studies.length > 0 ? Math.round((completed / appData.studies.length) * 100) : 0;
+      document.getElementById('study-progress-percent').innerText = `${percent}%`;
+    }
+
+    function handleAddStudy(e) {
+      e.preventDefault();
+      const subject = document.getElementById('study-subject').value;
+      const topic = document.getElementById('study-topic').value;
+      const duration = document.getElementById('study-duration').value;
+
+      appData.studies.push({ id: Date.now(), subject, topic, duration, done: false });
+      saveState();
+      renderStudies();
+      closeModal('study-modal');
+      e.target.reset();
+    }
+
+    function toggleStudy(id) {
+      const s = appData.studies.find(x => x.id === id);
+      if (s) { s.done = !s.done; saveState(); renderStudies(); }
+    }
+
+    function deleteStudy(id) {
+      appData.studies = appData.studies.filter(x => x.id !== id);
+      saveState();
+      renderStudies();
+    }
+
+    /* 3. TREINOS */
+    function renderWorkouts() {
+      const container = document.getElementById('workout-list');
+      container.innerHTML = '';
+
+      if (appData.workouts.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhum exercício cadastrado.</p>`;
+        return;
+      }
+
+      appData.workouts.forEach(w => {
+        const item = document.createElement('div');
+        item.className = `p-4 rounded-xl border border-planner-border flex items-center justify-between ${w.done ? 'bg-gray-50 opacity-60' : 'bg-white'}`;
+        item.innerHTML = `
+          <div>
+            <span class="text-[10px] font-bold text-planner-accent uppercase tracking-wider">${w.group}</span>
+            <h4 class="text-sm font-semibold text-planner-brownDark ${w.done ? 'line-through' : ''}">${w.name}</h4>
+            <p class="text-xs text-gray-400">${w.sets} séries x ${w.reps} reps • ${w.weight}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="toggleWorkout(${w.id})" class="px-3 py-1 rounded-lg text-xs font-medium ${w.done ? 'bg-green-100 text-green-700' : 'bg-planner-roseBg text-planner-brown'}">
+              ${w.done ? 'Feito 💪' : 'Marcar Feito'}
+            </button>
+            <button onclick="deleteWorkout(${w.id})" class="text-gray-300 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function handleAddWorkout(e) {
+      e.preventDefault();
+      const group = document.getElementById('workout-group').value;
+      const name = document.getElementById('workout-name').value;
+      const sets = document.getElementById('workout-sets').value;
+      const reps = document.getElementById('workout-reps').value;
+      const weight = document.getElementById('workout-weight').value;
+
+      appData.workouts.push({ id: Date.now(), group, name, sets, reps, weight, done: false });
+      saveState();
+      renderWorkouts();
+      closeModal('workout-modal');
+      e.target.reset();
+    }
+
+    function toggleWorkout(id) {
+      const w = appData.workouts.find(x => x.id === id);
+      if (w) { w.done = !w.done; saveState(); renderWorkouts(); }
+    }
+
+    function deleteWorkout(id) {
+      appData.workouts = appData.workouts.filter(x => x.id !== id);
+      saveState();
+      renderWorkouts();
+    }
+
+    function saveBodyStats() {
+      appData.bodyStats = {
+        weight: document.getElementById('body-weight').value,
+        waist: document.getElementById('body-waist').value,
+        hip: document.getElementById('body-hip').value
+      };
+      saveState();
+    }
+
+    /* 4. HÁBITOS */
+    function renderHabits() {
+      const container = document.getElementById('habits-list');
+      const summaryContainer = document.getElementById('today-habits-summary');
+
+      container.innerHTML = '';
+      summaryContainer.innerHTML = '';
+
+      if (appData.habits.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic text-center py-4">Nenhum hábito cadastrado.</p>`;
+        summaryContainer.innerHTML = `<p class="text-xs text-gray-400 italic">Sem hábitos hoje.</p>`;
+        return;
+      }
+
+      appData.habits.forEach(h => {
+        // Render na aba de hábitos
+        const item = document.createElement('div');
+        item.className = `flex items-center justify-between p-4 rounded-xl border border-planner-border bg-white`;
+        item.innerHTML = `
+          <div class="flex items-center gap-3">
+            <button onclick="toggleHabit(${h.id})" class="w-8 h-8 rounded-full flex items-center justify-center border transition-all ${h.doneToday ? 'bg-planner-accent border-planner-accent text-white' : 'border-gray-300 text-transparent hover:border-planner-accent'}">
+              <i class="fa-solid fa-check text-xs"></i>
+            </button>
+            <span class="text-sm font-medium text-planner-brownDark ${h.doneToday ? 'line-through text-gray-400' : ''}">${h.title}</span>
+          </div>
+          <button onclick="deleteHabit(${h.id})" class="text-gray-300 hover:text-red-400 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
+        `;
+        container.appendChild(item);
+
+        // Render no resumo do Meu Dia
+        const sumItem = document.createElement('div');
+        sumItem.className = `flex items-center justify-between p-2 rounded-lg bg-planner-bg`;
+        sumItem.innerHTML = `
+          <span class="text-xs font-medium text-planner-brown ${h.doneToday ? 'line-through opacity-50' : ''}">${h.title}</span>
+          <button onclick="toggleHabit(${h.id})" class="text-xs font-bold ${h.doneToday ? 'text-green-600' : 'text-gray-400'}">
+            ${h.doneToday ? '✓' : '○'}
+          </button>
+        `;
+        summaryContainer.appendChild(sumItem);
+      });
+    }
+
+    function handleAddHabit(e) {
+      e.preventDefault();
+      const title = document.getElementById('habit-title').value;
+      appData.habits.push({ id: Date.now(), title, doneToday: false });
+      saveState();
+      renderHabits();
+      closeModal('habit-modal');
+      e.target.reset();
+    }
+
+    function toggleHabit(id) {
+      const h = appData.habits.find(x => x.id === id);
+      if (h) { h.doneToday = !h.doneToday; saveState(); renderHabits(); }
+    }
+
+    function deleteHabit(id) {
+      appData.habits = appData.habits.filter(x => x.id !== id);
+      saveState();
+      renderHabits();
+    }
+
+    /* 5. METAS */
+    function renderGoals() {
+      const container = document.getElementById('goals-list');
+      container.innerHTML = '';
+
+      if (appData.goals.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic col-span-2 text-center py-4">Nenhuma meta cadastrada.</p>`;
+        return;
+      }
+
+      appData.goals.forEach(g => {
+        const item = document.createElement('div');
+        item.className = `bg-white p-5 rounded-2xl border border-planner-border shadow-sm flex flex-col justify-between`;
+        item.innerHTML = `
+          <div>
+            <span class="text-[10px] font-bold text-planner-accent uppercase tracking-wider">${g.term}</span>
+            <h4 class="text-base font-serif font-semibold text-planner-brownDark mt-1 mb-3">${g.title}</h4>
+          </div>
+          <div class="flex items-center justify-between border-t border-planner-border pt-3 mt-4">
+            <button onclick="deleteGoal(${g.id})" class="text-xs text-gray-400 hover:text-red-400"><i class="fa-solid fa-trash"></i> Excluir</button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function handleAddGoal(e) {
+      e.preventDefault();
+      const title = document.getElementById('goal-title').value;
+      const term = document.getElementById('goal-term').value;
+      appData.goals.push({ id: Date.now(), title, term });
+      saveState();
+      renderGoals();
+      closeModal('goal-modal');
+      e.target.reset();
+    }
+
+    function deleteGoal(id) {
+      appData.goals = appData.goals.filter(x => x.id !== id);
+      saveState();
+      renderGoals();
+    }
+
+    /* 6. CADERNO & DIÁRIO */
+    function renderNotes() {
+      const container = document.getElementById('notes-list');
+      container.innerHTML = '';
+
+      if (appData.notes.length === 0) {
+        container.innerHTML = `<p class="text-xs text-gray-400 italic col-span-3 text-center py-4">Nenhuma anotação criada.</p>`;
+        return;
+      }
+
+      appData.notes.forEach(n => {
+        const item = document.createElement('div');
+        item.className = `bg-white p-5 rounded-2xl border border-planner-border shadow-sm flex flex-col justify-between h-48`;
+        item.innerHTML = `
+          <div>
+            <h4 class="font-serif font-semibold text-planner-brownDark text-base mb-2 line-clamp-1">${n.title}</h4>
+            <p class="text-xs text-gray-500 whitespace-pre-line line-clamp-4">${n.content}</p>
+          </div>
+          <div class="flex items-center justify-between border-t border-planner-border pt-2 text-[10px] text-gray-400">
+            <span>${n.date}</span>
+            <button onclick="deleteNote(${n.id})" class="text-gray-300 hover:text-red-400"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    function handleAddNote(e) {
+      e.preventDefault();
+      const title = document.getElementById('note-title').value;
+      const content = document.getElementById('note-content').value;
+      const date = new Date().toLocaleDateString('pt-BR');
+
+      appData.notes.push({ id: Date.now(), title, content, date });
+      saveState();
+      renderNotes();
+      closeModal('note-modal');
+      e.target.reset();
+    }
+
+    function deleteNote(id) {
+      appData.notes = appData.notes.filter(x => x.id !== id);
+      saveState();
+      renderNotes();
+    }
+
+    /* 7. CALENDÁRIO */
+    let calDate = new Date();
+
+    function renderCalendar() {
+      const monthYearStr = calDate.toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
+      document.getElementById('calendar-month-year').innerText = monthYearStr.charAt(0).toUpperCase() + monthYearStr.slice(1);
+
+      const daysContainer = document.getElementById('calendar-days');
+      daysContainer.innerHTML = '';
+
+      const firstDay = new Date(calDate.getFullYear(), calDate.getMonth(), 1).getDay();
+      const totalDays = new Date(calDate.getFullYear(), calDate.getMonth() + 1, 0).getDate();
+
+      // Espaços vazios do início do mês
+      for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'p-3 text-gray-200';
+        daysContainer.appendChild(empty);
+      }
+
+      // Dias reais
+      const today = new Date();
+      for (let d = 1; d <= totalDays; d++) {
+        const isToday = today.getDate() === d && today.getMonth() === calDate.getMonth() && today.getFullYear() === calDate.getFullYear();
+        const cell = document.createElement('div');
+        cell.className = `p-3 rounded-xl border border-planner-border flex flex-col items-center justify-center min-h-[50px] ${isToday ? 'bg-planner-accent text-white font-bold' : 'bg-white text-planner-brown hover:bg-planner-roseBg'}`;
+        cell.innerText = d;
+        daysContainer.appendChild(cell);
+      }
+    }
+
+    function changeMonth(delta) {
+      calDate.setMonth(calDate.getMonth() + delta);
+      renderCalendar();
+    }
+
+    /* MODAIS */
+    function openModal(id) {
+      document.getElementById(id).classList.remove('hidden');
+      document.getElementById(id).classList.add('flex');
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).classList.add('hidden');
+      document.getElementById(id).classList.remove('flex');
+    }
+
+    /* BACKUP / EXPORTAÇÃO */
+    function exportData() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(appData));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `meu_planner_backup_${new Date().toISOString().slice(0,10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+    }
+
+    function importData(event) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const imported = JSON.parse(e.target.result);
+          appData = imported;
+          saveState();
+          location.reload();
+        } catch (err) {
+          alert('Arquivo de backup inválido.');
+        }
+      };
+      reader.readAsText(event.target.files[0]);
+    }
+  </script>
+</body>
+</html>
+```
